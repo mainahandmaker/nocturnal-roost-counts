@@ -367,9 +367,9 @@ high_tide_count_20200505 &lt;- get_count(&quot;2020-05-05 19:20:00&quot;)</code>
   fxn_plot &lt;- ggplot(data = new_df) +
     # columns
     geom_col(aes(x = time_axis + minutes(15), y = total_count, 
-                 fill = &quot;Whimbrel per \n half-hour interval&quot;), alpha = 0.8) +
+                 fill = &quot;Whimbrel per half-hour interval&quot;), alpha = 0.8) +
     scale_fill_manual(name = NULL, 
-                      values = c(&quot;Whimbrel per \n half-hour interval&quot; = &quot;#BD973D&quot;)) +
+                      values = c(&quot;Whimbrel per half-hour interval&quot; = &quot;#BD973D&quot;)) +
     # make the breaks on the x-axis 30 minutes
     scale_x_datetime(breaks = scales::date_breaks(&quot;30 mins&quot;), minor_breaks = NULL, date_labels = &quot;%H:%M&quot;,
                      limits = c(x_start, x_end)) +
