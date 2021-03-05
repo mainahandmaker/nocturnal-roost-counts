@@ -384,19 +384,25 @@ high_tide_count_20200505 &lt;- get_count(&quot;2020-05-05 19:20:00&quot;)</code>
     
     # lines for times of day (vertical)
     geom_segment(data = new_df, aes(x = civ_twi, xend = civ_twi,
-                     y = 0, yend = hline_yint_civ_twi,
-                     color = &quot;Civil twilight&quot;, linetype = &quot;Civil twilight&quot;),
-                 size = 2.5, show.legend = FALSE, inherit.aes = FALSE) +
+                                    y = 0, yend = hline_yint_civ_twi,
+                                    color = &quot;Civil twilight&quot;, linetype = &quot;Civil twilight&quot;),
+                 size = 3, show.legend = FALSE, inherit.aes = FALSE) +
     geom_segment(data = new_df, aes(x = high_tide, xend = high_tide,
-                     y = 0, yend = hline_yint_high_tide,
-                     color = &quot;High tide&quot;, linetype = &quot;High tide&quot;),
-                 size = 2.5, show.legend = FALSE, inherit.aes = FALSE) +
+                                    y = 0, yend = hline_yint_high_tide,
+                                    color = &quot;High tide&quot;, linetype = &quot;High tide&quot;),
+                 size = 3, show.legend = FALSE, inherit.aes = FALSE) +
     
     # points on cumulative count line and moon phase icons
-    annotate(&quot;pointrange&quot;, x = as_datetime(civ_twi), y = hline_yint_civ_twi, ymin = hline_yint_civ_twi, ymax = hline_yint_civ_twi, color = &quot;#262E43&quot;, size = 1) +
-    annotate(&quot;pointrange&quot;, x = as_datetime(high_tide), y = hline_yint_high_tide, ymin = hline_yint_high_tide, ymax = hline_yint_high_tide, color = &quot;#5792CC&quot;, size = 1) +
-    annotation_custom(moon_icon, xmin = as_datetime(paste(this_date, &quot;16:00:00&quot;)), xmax = as_datetime(paste(this_date, &quot;17:15:00&quot;)), ymin = 16000, ymax = 19000) +
+    geom_point(x = as_datetime(civ_twi), y = hline_yint_civ_twi, 
+                    #ymin = hline_yint_civ_twi, ymax = hline_yint_civ_twi,
+               color = &quot;#262E43&quot;, shape = 15, size = 10) +
+    geom_point(x = as_datetime(high_tide), y = hline_yint_high_tide,
+                    #ymin = hline_yint_high_tide, ymax = hline_yint_high_tide,
+               color = &quot;#5792CC&quot;, shape = 17, size = 10) +
+    annotation_custom(moon_icon, xmin = as_datetime(paste(this_date, &quot;16:00:00&quot;)),
+                      xmax = as_datetime(paste(this_date, &quot;17:15:00&quot;)), ymin = 16000, ymax = 19000) +
     coord_cartesian(clip = &quot;off&quot;) +
+    
 
     # colors for lines
     scale_color_manual(name = NULL,
@@ -408,8 +414,8 @@ high_tide_count_20200505 &lt;- get_count(&quot;2020-05-05 19:20:00&quot;)</code>
     # linetypes for lines
     scale_linetype_manual(name = NULL, 
                           values = c(&quot;High tide&quot; = &quot;dotted&quot;,
-                                     &quot;Civil twilight&quot; = &quot;dotdash&quot;,
-                                     &quot;Total cumulative count&quot; = &quot;solid&quot;),
+                                     &quot;Civil twilight&quot; = &quot;dashed&quot;,
+                                    &quot;Total cumulative count&quot; = &quot;solid&quot;),
                           breaks = c(&quot;High tide&quot;, &quot;Civil twilight&quot;, &quot;Total cumulative count&quot;)) +
     
     # appearance
