@@ -263,7 +263,7 @@ whim_plot <- function(this_date) {
           panel.grid.minor = element_blank(),
           panel.grid.major = element_blank(),
           panel.grid.major.y = element_line(color = "#F0F0F0"),
-          legend.key.width = unit(3, "cm"),
+          legend.key.width = unit(4, "cm"),
           legend.text = element_text(size = 32)) +
           #legend.position = "bottom",
           #legend.justification = "center") +
