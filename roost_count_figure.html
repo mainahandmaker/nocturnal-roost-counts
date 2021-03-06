@@ -379,44 +379,51 @@ high_tide_count_20200505 &lt;- get_count(&quot;2020-05-05 19:20:00&quot;)</code>
     # cumulative count line
     geom_line(data = new_cumul_df, aes(x = time_ID, y = arr_cumul, 
                                        color = &quot;Total cumulative count&quot;, 
-                                       linetype = &quot;Total cumulative count&quot;),
+                                       linetype = &quot;Total cumulative count&quot;,
+                                       shape = &quot;Total cumulative count&quot;),
               size = 2.5, show.legend = NA) +
     
     # lines for times of day (vertical)
     geom_segment(data = new_df, aes(x = civ_twi, xend = civ_twi,
                                     y = 0, yend = hline_yint_civ_twi,
-                                    color = &quot;Civil twilight&quot;, linetype = &quot;Civil twilight&quot;),
+                                    color = &quot;Civil twilight&quot;, 
+                                    linetype = &quot;Civil twilight&quot;,
+                                    shape = &quot;Civil twilight&quot;),
                  size = 3, show.legend = FALSE, inherit.aes = FALSE) +
     geom_segment(data = new_df, aes(x = high_tide, xend = high_tide,
                                     y = 0, yend = hline_yint_high_tide,
-                                    color = &quot;High tide&quot;, linetype = &quot;High tide&quot;),
+                                    color = &quot;High tide&quot;, 
+                                    linetype = &quot;High tide&quot;,
+                                    shape = &quot;High tide&quot;),
                  size = 3, show.legend = FALSE, inherit.aes = FALSE) +
     
     # points on cumulative count line and moon phase icons
-    geom_point(x = as_datetime(civ_twi), y = hline_yint_civ_twi, 
-                    #ymin = hline_yint_civ_twi, ymax = hline_yint_civ_twi,
-               color = &quot;#262E43&quot;, shape = 15, size = 10) +
-    geom_point(x = as_datetime(high_tide), y = hline_yint_high_tide,
-                    #ymin = hline_yint_high_tide, ymax = hline_yint_high_tide,
-               color = &quot;#5792CC&quot;, shape = 17, size = 10) +
+    geom_point(aes(x = as_datetime(civ_twi), y = hline_yint_civ_twi,
+                   color = &quot;Civil twilight&quot;, linetype = &quot;Civil twilight&quot;, shape = &quot;Civil twilight&quot;), 
+               size = 10, show.legend = NA, inherit.aes = FALSE) +
+    geom_point(aes(x = as_datetime(high_tide), y = hline_yint_high_tide,
+                   color = &quot;High tide&quot;, linetype = &quot;High tide&quot;, shape = &quot;High tide&quot;), 
+               size = 10, show.legend = NA, inherit.aes = FALSE) +
     annotation_custom(moon_icon, xmin = as_datetime(paste(this_date, &quot;16:00:00&quot;)),
                       xmax = as_datetime(paste(this_date, &quot;17:15:00&quot;)), ymin = 16000, ymax = 19000) +
     coord_cartesian(clip = &quot;off&quot;) +
     
-
     # colors for lines
     scale_color_manual(name = NULL,
-                       values = c(&quot;High tide&quot; = &quot;#5792CC&quot;, 
+                       values = c(&quot;High tide&quot; = &quot;#5792CC&quot;,
                                   &quot;Civil twilight&quot; = &quot;#262E43&quot;,
-                                  &quot;Total cumulative count&quot; = &quot;#3B7D6E&quot;),
-                       breaks = c(&quot;High tide&quot;, 
-                                  &quot;Civil twilight&quot;, &quot;Total cumulative count&quot;)) +
+                                  &quot;Total cumulative count&quot; = &quot;#3B7D6E&quot;)) +
     # linetypes for lines
-    scale_linetype_manual(name = NULL, 
+    scale_linetype_manual(name = NULL,
                           values = c(&quot;High tide&quot; = &quot;dotted&quot;,
                                      &quot;Civil twilight&quot; = &quot;dashed&quot;,
-                                    &quot;Total cumulative count&quot; = &quot;solid&quot;),
-                          breaks = c(&quot;High tide&quot;, &quot;Civil twilight&quot;, &quot;Total cumulative count&quot;)) +
+                                    &quot;Total cumulative count&quot; = &quot;solid&quot;)) +
+    # points for points
+    scale_shape_manual(name = NULL,
+                       values = c(&quot;High tide&quot; = 17,
+                                  &quot;Civil twilight&quot; = 15,
+                                  &quot;Total cumulative count&quot; = NA)) +
+    
     
     # appearance
     theme_light() +
@@ -429,7 +436,7 @@ high_tide_count_20200505 &lt;- get_count(&quot;2020-05-05 19:20:00&quot;)</code>
           panel.grid.minor = element_blank(),
           panel.grid.major = element_blank(),
           panel.grid.major.y = element_line(color = &quot;#F0F0F0&quot;),
-          legend.key.width = unit(3, &quot;cm&quot;),
+          legend.key.width = unit(5, &quot;cm&quot;),
           legend.text = element_text(size = 32)) +
           #legend.position = &quot;bottom&quot;,
           #legend.justification = &quot;center&quot;) +
@@ -442,25 +449,6 @@ high_tide_count_20200505 &lt;- get_count(&quot;2020-05-05 19:20:00&quot;)</code>
 </div>
 <div id="plot-each-survey-night" class="section level4">
 <h4>5. Plot each survey night</h4>
-<pre class="r"><code>plot_20190504 &lt;- whim_plot(&quot;2019-05-04&quot;) +
-  labs(x = &quot;&quot;)
-plot_20190516 &lt;- whim_plot(&quot;2019-05-16&quot;) +
-  labs(x = &quot;&quot;, y = &quot;&quot;) +
-  theme(axis.text.y = element_blank())
-plot_20190517 &lt;- whim_plot(&quot;2019-05-17&quot;) +
-  labs(y = &quot;&quot;) +
-  theme(axis.text.y = element_blank())
-plot_20200504 &lt;- whim_plot(&quot;2020-05-04&quot;) +
-  labs(x = &quot;&quot;)
-plot_20200505 &lt;- whim_plot(&quot;2020-05-05&quot;) +
-  labs(y = &quot;&quot;) +
-  theme(axis.text.y = element_blank())
-
-plot_20190504</code></pre>
-<pre class="r"><code>plot_20190516</code></pre>
-<pre class="r"><code>plot_20190517</code></pre>
-<pre class="r"><code>plot_20200504</code></pre>
-<pre class="r"><code>plot_20200505</code></pre>
 </div>
 <div id="patchwork-plots-together-for-final-figure" class="section level4">
 <h4>6. Patchwork plots together for final figure</h4>

@@ -247,8 +247,8 @@ whim_plot <- function(this_date) {
                                     "Total cumulative count" = "solid")) +
     # points for points
     scale_shape_manual(name = NULL,
-                       values = c("High tide" = 15,
-                                  "Civil twilight" = 17,
+                       values = c("High tide" = 17,
+                                  "Civil twilight" = 15,
                                   "Total cumulative count" = NA)) +
     
     
@@ -263,7 +263,7 @@ whim_plot <- function(this_date) {
           panel.grid.minor = element_blank(),
           panel.grid.major = element_blank(),
           panel.grid.major.y = element_line(color = "#F0F0F0"),
-          legend.key.width = unit(4, "cm"),
+          legend.key.width = unit(5, "cm"),
           legend.text = element_text(size = 32)) +
           #legend.position = "bottom",
           #legend.justification = "center") +
@@ -276,7 +276,7 @@ whim_plot <- function(this_date) {
 ```
 
 #### 5. Plot each survey night 
-```{r, fig.show="hide"}
+```{r, include = FALSE}
 plot_20190504 <- whim_plot("2019-05-04") +
   labs(x = "")
 plot_20190516 <- whim_plot("2019-05-16") +
@@ -309,6 +309,6 @@ all_5_nights
 
 ```{r}
 # save 
-ggsave("WaderStudy_Fig2_AB.jpg", all_5_nights, width = 35, height = 18, dpi = 300)
+ggsave("WaderStudy_Fig2.jpg", all_5_nights, width = 35, height = 18, dpi = 300)
 ```
 
