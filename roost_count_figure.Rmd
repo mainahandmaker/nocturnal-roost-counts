@@ -38,7 +38,7 @@ deveaux_30min <- deveaux_bydate %>%
   mutate(time_axis = paste(date, interval) %>% as_datetime())
 ```
 
-#### 2. Cumulative counts wihtout intervals - so we can plot a "total cumulative count" line calculated using the cumulative counts by each time point, rather than by each half-hour interval used for the bar plot.
+#### 2. Cumulative counts without intervals - so we can plot a "total cumulative count" line calculated using the cumulative counts by each time point, rather than by each half-hour interval used for the bar plot.
 ```{r}
 deveaux_cumul <- deveaux_bydate %>% 
   dplyr::filter(date %in% as.Date(c("2019-05-04", "2019-05-16", "2019-05-17", "2020-05-04", "2020-05-05"))) %>% 
@@ -227,10 +227,10 @@ whim_plot <- function(this_date) {
     # points on cumulative count line and moon phase icons
     geom_point(aes(x = as_datetime(civ_twi), y = hline_yint_civ_twi,
                    color = "Civil twilight", linetype = "Civil twilight", shape = "Civil twilight"), 
-               size = 10, show.legend = NA, inherit.aes = FALSE) +
+               size = 12, show.legend = NA, inherit.aes = FALSE) +
     geom_point(aes(x = as_datetime(high_tide), y = hline_yint_high_tide,
                    color = "High tide", linetype = "High tide", shape = "High tide"), 
-               size = 10, show.legend = NA, inherit.aes = FALSE) +
+               size = 12, show.legend = NA, inherit.aes = FALSE) +
     annotation_custom(moon_icon, xmin = as_datetime(paste(this_date, "16:00:00")),
                       xmax = as_datetime(paste(this_date, "17:15:00")), ymin = 16000, ymax = 19000) +
     coord_cartesian(clip = "off") +
@@ -258,6 +258,8 @@ whim_plot <- function(this_date) {
           axis.text.y = element_text(size = 24, face = "bold", color = "#63605F"),
           axis.title.x = element_text(size = 30, hjust = 1, color = "#63605F"),
           axis.title.y = element_text(size = 30, hjust = 1, color = "#63605F"),
+          axis.ticks.x = element_line(size = 1),
+          axis.ticks.length.x = unit(.4, "cm"),
           plot.title = element_text(size = 28, hjust = 0.5, face = "bold", margin = margin(b = 15, unit = "pt"), color = "#63605F"),
           plot.margin = unit(c(.5,.5,.5,.5), "cm"),
           panel.grid.minor = element_blank(),
@@ -312,8 +314,6 @@ all_5_nights
 
 ```{r}
 # save 
-ggsave("WaderStudy_Fig2_bars-shifted-15min.jpg", all_5_nights, width = 35, height = 18, dpi = 300)
-ggsave("WaderStudy_Fig2_bars-shifted-30min.jpg", all_5_nights, width = 35, height = 18, dpi = 300)
-ggsave("WaderStudy_Fig2_original-bars.jpg", all_5_nights, width = 35, height = 18, dpi = 300)
+ggsave("WaderStudy_Fig2_2021-03-10.jpg", all_5_nights, width = 35, height = 18, dpi = 300)
 ```
 
