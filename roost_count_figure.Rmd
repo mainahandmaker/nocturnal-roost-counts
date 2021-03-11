@@ -277,6 +277,211 @@ whim_plot <- function(this_date) {
 }
 ```
 
+
+#### 4a. Same function but for B&W version of plot for Wader Study print publication
+```{r}
+whim_plot <- function(this_date) {
+  ## pre-plotting
+  # datetimes for scale_x_datetime
+  x_start <- as_datetime(paste(this_date, "16:00:00")) 
+  x_end <- as_datetime(paste(this_date, "22:30:00")) 
+  
+  # times for sunset, sunrise, etc.
+  
+  civ_twi <- as_datetime(
+    paste(
+      this_date, (
+        if(this_date == "2019-05-04") {
+          "20:30:00"
+        } else if (this_date == "2019-05-16") {
+          "20:39:00"
+        } else if (this_date == "2019-05-17") {
+          "20:40:00"
+        } else if (this_date == "2020-05-04") {
+          "20:30:00"
+        }  else if (this_date == "2020-05-05") {
+            "20:31:00"
+        }
+      )
+    )
+  )
+  
+  high_tide <- as_datetime(
+    paste(
+      this_date, (
+        if(this_date == "2019-05-04") {
+          "20:39:00"
+        } else if (this_date == "2019-05-16") {
+          "19:11:00"
+        } else if (this_date == "2019-05-17") {
+          "20:01:00"
+        } else if (this_date == "2020-05-04") {
+          "18:25:00"
+        } else if (this_date == "2020-05-05") {
+          "19:20:00"
+        }
+      )
+    )
+  )
+  
+
+  # for points on the cumulative line
+  
+  hline_yint_civ_twi <- if(this_date == "2019-05-04") {
+    civ_twi_count_20190504
+  } else if (this_date == "2019-05-16") {
+    civ_twi_count_20190516
+  } else if (this_date == "2019-05-17") {
+    civ_twi_count_20190517
+  } else if (this_date == "2020-05-04") {
+    civ_twi_count_20200504
+  } else if (this_date == "2020-05-05") {
+    civ_twi_count_20200505
+  }
+  
+  hline_yint_high_tide <- if(this_date == "2019-05-04") {
+    high_tide_count_20190504
+  } else if (this_date == "2019-05-16") {
+    high_tide_count_20190516
+  } else if (this_date == "2019-05-17") {
+    high_tide_count_20190517
+  } else if (this_date == "2020-05-04") {
+    high_tide_count_20200504
+  } else if (this_date == "2020-05-05") {
+    high_tide_count_20200505
+  }
+  
+  #for plot titles
+  plot_title <- if(this_date == "2019-05-04") {
+    plot_title <- "4 May 2019"
+  } else if (this_date == "2019-05-16") {
+    plot_title <- "16 May 2019"
+  } else if (this_date == "2019-05-17") {
+    plot_title <- "17 May 2019"
+  } else if (this_date == "2020-05-04") {
+    plot_title <- "4 May 2020"
+  } else if (this_date == "2020-05-05") {
+    plot_title <- "5 May 2020"
+  }
+  
+  # function to get the right moon phase icon
+  
+  get_moon <- function(filename) {
+    grid::rasterGrob(png::readPNG(filename), interpolate = TRUE)
+  }
+  
+  moon_icon <- get_moon(
+    paste(
+      if(this_date =="2019-05-04") {
+        "4may19.png"
+      } else if (this_date == "2019-05-16") {
+        "16may19_5may20.png"
+      } else if(this_date == "2019-05-17") {
+        "17may19.png"
+      } else if(this_date == "2020-05-04") {
+        "4may20.png"
+      } else if(this_date == "2020-05-05") {
+        "16may19_5may20.png"
+      }
+    )
+  )
+
+  # new data frame
+  new_df <- deveaux_30min %>% 
+    filter(date == as.Date({{ this_date }}))
+  
+  new_cumul_df <- deveaux_cumul %>% 
+    filter(date == as.Date({{ this_date }}))
+  
+  # plot
+  fxn_plot <- ggplot(data = new_df) +
+    # columns
+    geom_col(aes(x = time_axis + minutes(15), y = total_count, 
+                 fill = "Whimbrel per half-hour interval"), alpha = 0.8) +
+    scale_fill_manual(name = NULL, 
+                      values = c("Whimbrel per half-hour interval" = "gray70")) +
+    # make the breaks on the x-axis 30 minutes
+    scale_x_datetime(breaks = scales::date_breaks("30 mins"), minor_breaks = NULL, date_labels = "%H:%M",
+                     limits = c(x_start, x_end)) +
+    # make the breaks on the y-axis 1000
+    scale_y_continuous(expand = c(0, 0), limits = c(0, 20000), minor_breaks = seq(from = 0, to = 20000, by = 1000)) +
+    
+    # cumulative count line
+    geom_line(data = new_cumul_df, aes(x = time_ID, y = arr_cumul, 
+                                       color = "Total cumulative count", 
+                                       linetype = "Total cumulative count",
+                                       shape = "Total cumulative count"),
+              size = 2.5, show.legend = NA) +
+    
+    # lines for times of day (vertical)
+    geom_segment(data = new_df, aes(x = civ_twi, xend = civ_twi,
+                                    y = 0, yend = hline_yint_civ_twi,
+                                    color = "Civil twilight", 
+                                    linetype = "Civil twilight",
+                                    shape = "Civil twilight"),
+                 size = 3, show.legend = FALSE, inherit.aes = FALSE) +
+    geom_segment(data = new_df, aes(x = high_tide, xend = high_tide,
+                                    y = 0, yend = hline_yint_high_tide,
+                                    color = "High tide", 
+                                    linetype = "High tide",
+                                    shape = "High tide"),
+                 size = 3, show.legend = FALSE, inherit.aes = FALSE) +
+    
+    # points on cumulative count line and moon phase icons
+    geom_point(aes(x = as_datetime(civ_twi), y = hline_yint_civ_twi,
+                   color = "Civil twilight", linetype = "Civil twilight", shape = "Civil twilight"), 
+               size = 12, show.legend = NA, inherit.aes = FALSE) +
+    geom_point(aes(x = as_datetime(high_tide), y = hline_yint_high_tide,
+                   color = "High tide", linetype = "High tide", shape = "High tide"), 
+               size = 12, show.legend = NA, inherit.aes = FALSE) +
+    annotation_custom(moon_icon, xmin = as_datetime(paste(this_date, "16:00:00")),
+                      xmax = as_datetime(paste(this_date, "17:15:00")), ymin = 16000, ymax = 19000) +
+    coord_cartesian(clip = "off") +
+    
+    # colors for lines
+    scale_color_manual(name = NULL,
+                       values = c("High tide" = "gray38",
+                                  "Civil twilight" = "gray20",
+                                  "Total cumulative count" = "gray50")) +
+    # linetypes for lines
+    scale_linetype_manual(name = NULL,
+                          values = c("High tide" = "dotted",
+                                     "Civil twilight" = "dashed",
+                                    "Total cumulative count" = "solid")) +
+    # points for points
+    scale_shape_manual(name = NULL,
+                       values = c("High tide" = 17,
+                                  "Civil twilight" = 15,
+                                  "Total cumulative count" = NA)) +
+    
+    
+    # appearance
+    theme_light() +
+    theme(axis.text.x = element_text(angle = 40, size = 22, face = "bold", vjust = 0.7, color = "#63605F"),
+          axis.text.y = element_text(size = 24, face = "bold", color = "#63605F"),
+          axis.title.x = element_text(size = 30, hjust = 1, color = "#63605F"),
+          axis.title.y = element_text(size = 30, hjust = 1, color = "#63605F"),
+          axis.ticks.x = element_line(size = 1),
+          axis.ticks.length.x = unit(.4, "cm"),
+          plot.title = element_text(size = 28, hjust = 0.5, face = "bold", margin = margin(b = 15, unit = "pt"), color = "#63605F"),
+          plot.margin = unit(c(.5,.5,.5,.5), "cm"),
+          panel.grid.minor = element_blank(),
+          panel.grid.major = element_blank(),
+          panel.grid.major.y = element_line(color = "#F0F0F0"),
+          legend.key.width = unit(5, "cm"),
+          legend.text = element_text(size = 32)) +
+          #legend.position = "bottom",
+          #legend.justification = "center") +
+    labs(x = "Time",
+         y = "Count",
+         title = {{ plot_title }})
+  
+  return(fxn_plot)
+}
+```
+
+
+
 #### 5. Plot each survey night 
 ```{r, include = FALSE}
 # this chunk will throw "Ignoring unknown aesthetics" errors but the plots will still run. This is because linetype, shape and color had to be
@@ -315,5 +520,6 @@ all_5_nights
 ```{r}
 # save 
 ggsave("WaderStudy_Fig2_2021-03-10.jpg", all_5_nights, width = 35, height = 18, dpi = 300)
+ggsave("WaderStudy_Fig2_2021-03-10_BW.jpg", all_5_nights, width = 35, height = 18, dpi = 300)
 ```
 
