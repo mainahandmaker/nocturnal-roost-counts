@@ -233,8 +233,8 @@ whim_plot <- function(this_date) {
     geom_point(aes(x = as_datetime(high_tide), y = hline_yint_high_tide,
                    color = "High tide", linetype = "High tide", shape = "High tide"), 
                size = 12, show.legend = NA, inherit.aes = FALSE) +
-    annotation_custom(moon_icon, xmin = as_datetime(paste(this_date, "16:00:00")),
-                      xmax = as_datetime(paste(this_date, "17:15:00")), ymin = 16000, ymax = 19000) +
+    annotation_custom(moon_icon, xmin = as_datetime(paste(this_date, "16:15:00")),
+                      xmax = as_datetime(paste(this_date, "17:30:00")), ymin = 16000, ymax = 19000) +
     coord_cartesian(clip = "off") +
     
     # colors for lines
