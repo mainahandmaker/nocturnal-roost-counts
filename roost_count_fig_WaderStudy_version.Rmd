@@ -203,13 +203,14 @@ whim_plot <- function(this_date) {
                      date_labels = "%H:%M",
                      limits = c(x_start, x_end)) +
     # make the breaks on the y-axis 1000
-    scale_y_continuous(expand = c(0, 0), limits = c(0, 20000), minor_breaks = seq(from = 0, to = 20000, by = 1000)) +
+    scale_y_continuous(expand = c(0, 0), limits = c(0, 20000), minor_breaks = seq(from = 0, to = 20000, by = 1000),
+                       labels = c("0", "5", "10", "15", "20")) +
     
     # cumulative count line
     geom_line(data = new_cumul_df, aes(x = time_ID, y = arr_cumul, 
-                                       color = "Total cumulative count", 
-                                       linetype = "Total cumulative count",
-                                       shape = "Total cumulative count"),
+                                       color = "Cumulative count", 
+                                       linetype = "Cumulative count",
+                                       shape = "Cumulative count"),
               size = 2.5, show.legend = NA) +
     
     # lines for times of day (vertical)
@@ -241,27 +242,37 @@ whim_plot <- function(this_date) {
     scale_color_manual(name = NULL,
                        values = c("High tide" = "gray38",
                                   "Civil twilight" = "gray20",
-                                  "Total cumulative count" = "gray50")) +
+                                  "Cumulative count" = "gray50"),
+                       breaks = c("High tide", "Civil twilight", "Cumulative count")) +
     # linetypes for lines
     scale_linetype_manual(name = NULL,
                           values = c("High tide" = "dotted",
                                      "Civil twilight" = "dashed",
-                                    "Total cumulative count" = "solid")) +
+                                    "Cumulative count" = "solid"),
+                          breaks = c("High tide", "Civil twilight", "Cumulative count")) +
     # points for points
     scale_shape_manual(name = NULL,
                        values = c("High tide" = 17,
                                   "Civil twilight" = 15,
-                                  "Total cumulative count" = NA)) +
+                                  "Cumulative count" = NA),
+                       breaks = c("High tide", "Civil twilight", "Cumulative count")) +
+    
+    #guides("High tide" = guide_legend(order = 1),
+         #  "Civil twilight" = guide_legend(order = 2),
+          # "Cumulative count" = guide_legend(order = 3),
+          # "Whimbrel per half-hour interval" = guide_legend(order = 4)) +
     
     
     # appearance
     theme_bw() +
-    theme(axis.text.x = element_text(angle = 40, size = 40, face = "bold", hjust = 1.0, color = rep(c("#FFFFFF", "black"), times = 6)),
-          axis.text.y = element_text(size = 40, face = "bold", color = "black"),
-          axis.title.x = element_text(size = 45, hjust = 1),
-          axis.title.y = element_text(size = 45, hjust = 1),
-          axis.ticks.x = element_line(size = 1),
+    theme(axis.text.x = element_text(angle = 40, size = 40, face = "bold", hjust = 1.0, color = rep(c("#FFFFFF", "black"), times = 6), margin = margin(t=10, r=0, b=10, l=0)),
+          axis.text.y = element_text(size = 40, face = "bold", color = "black", margin = margin(t=0, r=10, b=0, l=10)),
+          axis.title.x = element_text(size = 45, margin = margin(t=20, r=0, b=20, l=0)),
+          axis.title.y = element_text(size = 45, margin = margin(t=0, r=20, b=0, l=20)),
+          axis.ticks.x = element_line(size = 1, color = "black"),
+          axis.ticks.y = element_line(size = 1, color = "black"),
           axis.ticks.length.x = unit(.4, "cm"),
+          axis.ticks.length.y = unit(.4, "cm"),
           panel.border = element_rect(color = "black", size = 1.5),
           plot.title = element_text(size = 50, hjust = 0.5, face = "bold", margin = margin(b = 15, unit = "pt")),
           plot.margin = unit(c(.5,.5,.5,.5), "cm"),
@@ -271,8 +282,8 @@ whim_plot <- function(this_date) {
           legend.text = element_text(size = 50)) +
           #legend.position = "bottom",
           #legend.justification = "center") +
-    labs(x = "Time",
-         y = "Count",
+    labs(x = "Time of day",
+         y = "Count (thousands)",
          title = {{ plot_title }})
   
   return(fxn_plot)
@@ -292,7 +303,7 @@ plot_20190516 <- whim_plot("2019-05-16") +
   labs(x = "", y = "") +
   theme(axis.text.y = element_blank())
 plot_20190517 <- whim_plot("2019-05-17") +
-  labs(y = "") +
+  labs(x = "", y = "") +
   theme(axis.text.y = element_blank())
 plot_20200504 <- whim_plot("2020-05-04") +
   labs(x = "")
@@ -310,14 +321,15 @@ plot_20200505
 #### 6. Patchwork plots together for final figure
 ```{r, fig.show="hide"}
 all_5_nights_BW <- (plot_20190504 + plot_20190516 + plot_20190517 + plot_layout(widths = c(3, 3, 3))) /
-  (plot_spacer() + plot_20200504 + plot_20200505 + plot_spacer() + plot_layout(widths = c(1.5, 3.5, 3.5, 1.5))) +
+  (plot_spacer() + plot_20200504 + plot_20200505 + plot_spacer() + plot_layout(widths = c(1.5, 3.3, 3.3, 1.5))) +
   plot_layout(guides = "collect") & theme(legend.position = "bottom",  legend.box.margin = margin(1, 1, 1, 1, unit = "cm"), legend.box = "vertical")
 
-all_5_nights
+all_5_nights_BW
 ```
 
 
 ```{r}
 # save 
-ggsave("WaderStudy_Fig2_2021-03-13_BW.jpg", all_5_nights_BW, width = 36, height = 20, dpi = 300)
+ggsave("WaderStudy_Fig2_2021-03-24_BW.jpg", all_5_nights_BW, width = 36, height = 20, dpi = 300)
+ggsave("WHIM-roost_Fig2.pdf", all_5_nights_BW, device = "pdf", width = 36, height = 20, dpi = 300)
 ```
