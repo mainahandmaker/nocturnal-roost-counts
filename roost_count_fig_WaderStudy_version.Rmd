@@ -75,7 +75,7 @@ high_tide_count_20200504 <- get_count("2020-05-04 18:25:00")
 high_tide_count_20200505 <- get_count("2020-05-05 19:20:00")
 ```
 
-#### 4. Function  for B&W version of plot for Wader Study publication
+#### 4. Function  for B&W version of plot for Wader Study publication - horizontal
 ```{r}
 whim_plot <- function(this_date) {
   ## pre-plotting
@@ -290,9 +290,222 @@ whim_plot <- function(this_date) {
 }
 ```
 
+#### 4a. replot for vertical figure - different size/placement labels & legend
+```{r}
+whim_plot <- function(this_date) {
+  ## pre-plotting
+  # datetimes for scale_x_datetime
+  x_start <- as_datetime(paste(this_date, "16:30:00")) 
+  x_end <- as_datetime(paste(this_date, "22:00:00")) 
+  
+  # times for sunset, sunrise, etc.
+  
+  civ_twi <- as_datetime(
+    paste(
+      this_date, (
+        if(this_date == "2019-05-04") {
+          "20:30:00"
+        } else if (this_date == "2019-05-16") {
+          "20:39:00"
+        } else if (this_date == "2019-05-17") {
+          "20:40:00"
+        } else if (this_date == "2020-05-04") {
+          "20:30:00"
+        }  else if (this_date == "2020-05-05") {
+            "20:31:00"
+        }
+      )
+    )
+  )
+  
+  high_tide <- as_datetime(
+    paste(
+      this_date, (
+        if(this_date == "2019-05-04") {
+          "20:39:00"
+        } else if (this_date == "2019-05-16") {
+          "19:11:00"
+        } else if (this_date == "2019-05-17") {
+          "20:01:00"
+        } else if (this_date == "2020-05-04") {
+          "18:25:00"
+        } else if (this_date == "2020-05-05") {
+          "19:20:00"
+        }
+      )
+    )
+  )
+  
+
+  # for points on the cumulative line
+  
+  hline_yint_civ_twi <- if(this_date == "2019-05-04") {
+    civ_twi_count_20190504
+  } else if (this_date == "2019-05-16") {
+    civ_twi_count_20190516
+  } else if (this_date == "2019-05-17") {
+    civ_twi_count_20190517
+  } else if (this_date == "2020-05-04") {
+    civ_twi_count_20200504
+  } else if (this_date == "2020-05-05") {
+    civ_twi_count_20200505
+  }
+  
+  hline_yint_high_tide <- if(this_date == "2019-05-04") {
+    high_tide_count_20190504
+  } else if (this_date == "2019-05-16") {
+    high_tide_count_20190516
+  } else if (this_date == "2019-05-17") {
+    high_tide_count_20190517
+  } else if (this_date == "2020-05-04") {
+    high_tide_count_20200504
+  } else if (this_date == "2020-05-05") {
+    high_tide_count_20200505
+  }
+  
+  #for plot titles
+  plot_title <- if(this_date == "2019-05-04") {
+    plot_title <- "4 May 2019"
+  } else if (this_date == "2019-05-16") {
+    plot_title <- "16 May 2019"
+  } else if (this_date == "2019-05-17") {
+    plot_title <- "17 May 2019"
+  } else if (this_date == "2020-05-04") {
+    plot_title <- "4 May 2020"
+  } else if (this_date == "2020-05-05") {
+    plot_title <- "5 May 2020"
+  }
+  
+  # function to get the right moon phase icon
+  
+  get_moon <- function(filename) {
+    grid::rasterGrob(png::readPNG(filename), interpolate = TRUE)
+  }
+  
+  moon_icon <- get_moon(
+    paste(
+      if(this_date =="2019-05-04") {
+        "4may19_BW.png"
+      } else if (this_date == "2019-05-16") {
+        "16may19_5may20_BW.png"
+      } else if(this_date == "2019-05-17") {
+        "17may19_BW.png"
+      } else if(this_date == "2020-05-04") {
+        "4may20_BW.png"
+      } else if(this_date == "2020-05-05") {
+        "16may19_5may20_BW.png"
+      }
+    )
+  )
+
+  # new data frame
+  new_df <- deveaux_30min %>% 
+    filter(date == as.Date({{ this_date }}))
+  
+  new_cumul_df <- deveaux_cumul %>% 
+    filter(date == as.Date({{ this_date }}))
+  
+  # plot
+  fxn_plot <- ggplot(data = new_df) +
+    # columns
+    geom_col(aes(x = time_axis + minutes(15), y = total_count, 
+                 fill = "Whimbrel per half-hour interval"), alpha = 0.8) +
+    scale_fill_manual(name = NULL, 
+                      values = c("Whimbrel per half-hour interval" = "gray70")) +
+    # make the breaks on the x-axis 30 minutes
+    scale_x_datetime(breaks = scales::date_breaks("30 mins"), 
+                     minor_breaks = scales::date_breaks("30 mins"), 
+                     date_labels = "%H:%M",
+                     limits = c(x_start, x_end)) +
+    # make the breaks on the y-axis 1000
+    scale_y_continuous(expand = c(0, 0), limits = c(0, 20000), minor_breaks = seq(from = 0, to = 20000, by = 1000),
+                       labels = c("0", "5", "10", "15", "20")) +
+    
+    # cumulative count line
+    geom_line(data = new_cumul_df, aes(x = time_ID, y = arr_cumul, 
+                                       color = "Cumulative count", 
+                                       linetype = "Cumulative count",
+                                       shape = "Cumulative count"),
+              size = 2.5, show.legend = NA) +
+    
+    # lines for times of day (vertical)
+    geom_segment(data = new_df, aes(x = civ_twi, xend = civ_twi,
+                                    y = 0, yend = hline_yint_civ_twi,
+                                    color = "Civil twilight", 
+                                    linetype = "Civil twilight",
+                                    shape = "Civil twilight"),
+                 size = 3, show.legend = FALSE, inherit.aes = FALSE) +
+    geom_segment(data = new_df, aes(x = high_tide, xend = high_tide,
+                                    y = 0, yend = hline_yint_high_tide,
+                                    color = "High tide", 
+                                    linetype = "High tide",
+                                    shape = "High tide"),
+                 size = 3, show.legend = FALSE, inherit.aes = FALSE) +
+    
+    # points on cumulative count line and moon phase icons
+    geom_point(aes(x = as_datetime(civ_twi), y = hline_yint_civ_twi,
+                   color = "Civil twilight", linetype = "Civil twilight", shape = "Civil twilight"), 
+               size = 12, show.legend = NA, inherit.aes = FALSE) +
+    geom_point(aes(x = as_datetime(high_tide), y = hline_yint_high_tide,
+                   color = "High tide", linetype = "High tide", shape = "High tide"), 
+               size = 12, show.legend = NA, inherit.aes = FALSE) +
+    annotation_custom(moon_icon, xmin = as_datetime(paste(this_date, "16:30:00")),
+                      xmax = as_datetime(paste(this_date, "17:30:00")), ymin = 14000, ymax = 18000) +
+    #coord_cartesian(clip = "off") +
+    
+    # colors for lines
+    scale_color_manual(name = NULL,
+                       values = c("High tide" = "gray38",
+                                  "Civil twilight" = "gray20",
+                                  "Cumulative count" = "gray50"),
+                       breaks = c("High tide", "Civil twilight", "Cumulative count")) +
+    # linetypes for lines
+    scale_linetype_manual(name = NULL,
+                          values = c("High tide" = "dotted",
+                                     "Civil twilight" = "dashed",
+                                    "Cumulative count" = "solid"),
+                          breaks = c("High tide", "Civil twilight", "Cumulative count")) +
+    # points for points
+    scale_shape_manual(name = NULL,
+                       values = c("High tide" = 17,
+                                  "Civil twilight" = 15,
+                                  "Cumulative count" = NA),
+                       breaks = c("High tide", "Civil twilight", "Cumulative count")) +
+    
+    #guides("High tide" = guide_legend(order = 1),
+         #  "Civil twilight" = guide_legend(order = 2),
+          # "Cumulative count" = guide_legend(order = 3),
+          # "Whimbrel per half-hour interval" = guide_legend(order = 4)) +
+    
+    # appearance
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 40, size = 40, face = "bold", hjust = 1.0, color = rep(c("#FFFFFF", "black"), times = 6), margin = margin(t=10, r=0, b=10, l=0)),
+          axis.text.y = element_text(size = 40, face = "bold", color = "black", margin = margin(t=0, r=10, b=0, l=10)),
+          axis.title.x = element_text(size = 65, margin = margin(t=20, r=0, b=20, l=0)),
+          axis.title.y = element_text(size = 65, margin = margin(t=0, r=20, b=0, l=20)),
+          axis.ticks.x = element_line(size = 1, color = "black"),
+          axis.ticks.y = element_line(size = 1, color = "black"),
+          axis.ticks.length.x = unit(.4, "cm"),
+          axis.ticks.length.y = unit(.4, "cm"),
+          panel.border = element_rect(color = "black", size = 1.5),
+          plot.title = element_text(size = 50, hjust = 0.5, face = "bold", margin = margin(b = 15, unit = "pt")),
+          plot.margin = unit(c(.5,.5,.5,.5), "cm"),
+          panel.grid.minor = element_blank(),
+          panel.grid.major = element_blank(),
+          legend.key.width = unit(4, "cm"),
+          legend.text = element_text(size = 45)) +
+          #legend.position = "bottom",
+          #legend.justification = "center") +
+    labs(x = "Time of day",
+         y = "Count (thousands)",
+         title = {{ plot_title }})
+  
+  return(fxn_plot)
+}
+```
 
 
-#### 5. Plot each survey night 
+#### 5. Plot each survey night - horizontal figure
 ```{r, include = FALSE}
 # this chunk will throw "Ignoring unknown aesthetics" errors but the plots will still run. This is because linetype, shape and color had to be
 # called in the aesthetics for all geoms in order to create the legend we wanted, but R has to ignore the aesthetics that don't exist for some 
@@ -318,7 +531,7 @@ plot_20200504
 plot_20200505
 ```
 
-#### 6. Patchwork plots together for final figure
+#### 6. Patchwork plots together for final horizontal figure
 ```{r, fig.show="hide"}
 all_5_nights_BW <- (plot_20190504 + plot_20190516 + plot_20190517 + plot_layout(widths = c(3, 3, 3))) /
   (plot_spacer() + plot_20200504 + plot_20200505 + plot_spacer() + plot_layout(widths = c(1.5, 3.3, 3.3, 1.5))) +
@@ -327,9 +540,43 @@ all_5_nights_BW <- (plot_20190504 + plot_20190516 + plot_20190517 + plot_layout(
 all_5_nights_BW
 ```
 
+#### 7. Plot each survey  night - vertical figure
+```{r, include = FALSE}
+# this chunk will throw "Ignoring unknown aesthetics" errors but the plots will still run. This is because linetype, shape and color had to be
+# called in the aesthetics for all geoms in order to create the legend we wanted, but R has to ignore the aesthetics that don't exist for some 
+# of those geoms - i.e. there is no shape for the cumulative count line
+plot_20190504v <- whim_plot("2019-05-04") +
+  labs(x = "", y = "") 
+plot_20190516v <- whim_plot("2019-05-16") +
+  labs(x = "", y = "") 
+plot_20190517v <- whim_plot("2019-05-17") +
+  labs(x = "") 
+plot_20200504v <- whim_plot("2020-05-04") +
+  labs(x = "", y = "") 
+plot_20200505v <- whim_plot("2020-05-05") +
+  labs(y = "")
+
+plot_20190504v
+plot_20190516v
+plot_20190517v
+plot_20200504v
+plot_20200505v
+```
+
+
+#### . Patchwork plots together for final vertical figure
+```{r}
+BW_vertical <- (plot_20190504v / plot_20190516v / plot_20190517v / plot_20200504v / plot_20200505v + 
+                plot_layout(guides = "collect") & theme(legend.position = "bottom",
+                legend.box.margin = margin(1, 1, 1, 1, unit = "cm"), legend.box = "vertical"))
+
+BW_vertical
+```
+
 
 ```{r}
 # save 
 ggsave("WaderStudy_Fig2_2021-03-24_BW.jpg", all_5_nights_BW, width = 36, height = 20, dpi = 300)
 ggsave("WHIM-roost_Fig2.pdf", all_5_nights_BW, device = "pdf", width = 36, height = 20, dpi = 300)
+ggsave("BW_vertical_test.jpg", BW_vertical, width = 20, height = 45, dpi=300)
 ```
