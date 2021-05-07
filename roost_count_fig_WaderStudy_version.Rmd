@@ -194,9 +194,9 @@ whim_plot <- function(this_date) {
   fxn_plot <- ggplot(data = new_df) +
     # columns
     geom_col(aes(x = time_axis + minutes(15), y = total_count, 
-                 fill = "Whimbrel per half-hour interval"), alpha = 0.8) +
+                 fill = "Whimbrel per \n half-hour interval"), alpha = 0.8) +
     scale_fill_manual(name = NULL, 
-                      values = c("Whimbrel per half-hour interval" = "gray70")) +
+                      values = c("Whimbrel per \n half-hour interval" = "gray70")) +
     # make the breaks on the x-axis 30 minutes
     scale_x_datetime(breaks = scales::date_breaks("30 mins"), 
                      minor_breaks = scales::date_breaks("30 mins"), 
@@ -409,9 +409,9 @@ whim_plot <- function(this_date) {
   fxn_plot <- ggplot(data = new_df) +
     # columns
     geom_col(aes(x = time_axis + minutes(15), y = total_count, 
-                 fill = "Whimbrel per half-hour interval"), alpha = 0.8) +
+                 fill = "Whimbrel per \n half-hour interval"), alpha = 0.8) +
     scale_fill_manual(name = NULL, 
-                      values = c("Whimbrel per half-hour interval" = "gray70")) +
+                      values = c("Whimbrel per \n half-hour interval" = "gray70")) +
     # make the breaks on the x-axis 30 minutes
     scale_x_datetime(breaks = scales::date_breaks("30 mins"), 
                      minor_breaks = scales::date_breaks("30 mins"), 
@@ -454,28 +454,28 @@ whim_plot <- function(this_date) {
     #coord_cartesian(clip = "off") +
     
     # colors for lines
+    # guides(fill=guide_legend(nrow=2,byrow=TRUE))
     scale_color_manual(name = NULL,
                        values = c("High tide" = "gray38",
                                   "Civil twilight" = "gray20",
                                   "Cumulative count" = "gray50"),
-                       breaks = c("High tide", "Civil twilight", "Cumulative count")) +
+                       breaks = c("High tide", "Civil twilight", "Cumulative count"),
+                       guide = guide_legend(nrow = 3, ncol = 1)) +
+
     # linetypes for lines
     scale_linetype_manual(name = NULL,
                           values = c("High tide" = "dotted",
                                      "Civil twilight" = "dashed",
                                     "Cumulative count" = "solid"),
-                          breaks = c("High tide", "Civil twilight", "Cumulative count")) +
+                          breaks = c("High tide", "Civil twilight", "Cumulative count"), 
+                          guide = guide_legend(nrow = 3, ncol = 1)) +
     # points for points
     scale_shape_manual(name = NULL,
                        values = c("High tide" = 17,
                                   "Civil twilight" = 15,
                                   "Cumulative count" = NA),
-                       breaks = c("High tide", "Civil twilight", "Cumulative count")) +
-    
-    #guides("High tide" = guide_legend(order = 1),
-         #  "Civil twilight" = guide_legend(order = 2),
-          # "Cumulative count" = guide_legend(order = 3),
-          # "Whimbrel per half-hour interval" = guide_legend(order = 4)) +
+                       breaks = c("High tide", "Civil twilight", "Cumulative count"), 
+                       guide = guide_legend(nrow = 3, ncol = 1)) +
     
     # appearance
     theme_bw() +
@@ -493,7 +493,9 @@ whim_plot <- function(this_date) {
           panel.grid.minor = element_blank(),
           panel.grid.major = element_blank(),
           legend.key.width = unit(4, "cm"),
-          legend.text = element_text(size = 45)) +
+          legend.text = element_text(size = 45),
+          legend.box = "vertical",
+          legend.background = element_rect("white")) +
           #legend.position = "bottom",
           #legend.justification = "center") +
     labs(x = "Time of day",
@@ -561,6 +563,8 @@ plot_20190516v
 plot_20190517v
 plot_20200504v
 plot_20200505v
+
+ggsave("plot_20200505v.jpg", plot_20200505v, width = 7, height = 5)
 ```
 
 
@@ -568,9 +572,10 @@ plot_20200505v
 ```{r}
 BW_vertical <- (plot_20190504v / plot_20190516v / plot_20190517v / plot_20200504v / plot_20200505v + 
                 plot_layout(guides = "collect") & theme(legend.position = "bottom",
-                legend.box.margin = margin(1, 1, 1, 1, unit = "cm"), legend.box = "vertical"))
+                legend.box.margin = margin(.1, .1, .1, .1, unit = "cm"), legend.box = "vertical"))
 
 BW_vertical
+ggsave("BW_vertical_test_AB.jpg", BW_vertical, width = 12, height = 45, dpi=300)
 ```
 
 
@@ -578,5 +583,5 @@ BW_vertical
 # save 
 ggsave("WaderStudy_Fig2_2021-03-24_BW.jpg", all_5_nights_BW, width = 36, height = 20, dpi = 300)
 ggsave("WHIM-roost_Fig2.pdf", all_5_nights_BW, device = "pdf", width = 36, height = 20, dpi = 300)
-ggsave("BW_vertical_test.jpg", BW_vertical, width = 20, height = 45, dpi=300)
+ggsave("BW_vertical_test_AB.jpg", BW_vertical, width = 10, height = 45, dpi=300)
 ```
