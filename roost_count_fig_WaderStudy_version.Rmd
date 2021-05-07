@@ -450,8 +450,8 @@ whim_plot <- function(this_date) {
                    color = "High tide", linetype = "High tide", shape = "High tide"), 
                size = 12, show.legend = NA, inherit.aes = FALSE) +
     annotation_custom(moon_icon, xmin = as_datetime(paste(this_date, "16:30:00")),
-                      xmax = as_datetime(paste(this_date, "17:30:00")), ymin = 14000, ymax = 18000) +
-    #coord_cartesian(clip = "off") +
+                      xmax = as_datetime(paste(this_date, "18:00:00")), ymin = 12000, ymax = 18000) +
+    coord_cartesian(clip = "off") +
     
     # colors for lines
     # guides(fill=guide_legend(nrow=2,byrow=TRUE))
@@ -479,17 +479,17 @@ whim_plot <- function(this_date) {
     
     # appearance
     theme_bw() +
-    theme(axis.text.x = element_text(angle = 40, size = 40, face = "bold", hjust = 1.0, color = rep(c("#FFFFFF", "black"), times = 6), margin = margin(t=10, r=0, b=10, l=0)),
-          axis.text.y = element_text(size = 40, face = "bold", color = "black", margin = margin(t=0, r=10, b=0, l=10)),
-          axis.title.x = element_text(size = 65, margin = margin(t=20, r=0, b=20, l=0)),
-          axis.title.y = element_text(size = 65, margin = margin(t=0, r=20, b=0, l=20)),
+    theme(axis.text.x = element_text(angle = 40, face = "bold", size = 35, hjust = 1.0, color = rep(c("#FFFFFF", "black"), times = 6), margin = margin(t=10, r=0, b=0, l=0)),
+          axis.text.y = element_text(size = 35, face="bold", color = "black", margin = margin(t=0, r=10, b=0, l=10)),
+          axis.title.x = element_text(size = 55, face = "bold", margin = margin(t=20, r=0, b=0, l=0)),
+          axis.title.y = element_text(size = 55, face = "bold", margin = margin(t=0, r=20, b=0, l=20)),
           axis.ticks.x = element_line(size = 1, color = "black"),
           axis.ticks.y = element_line(size = 1, color = "black"),
           axis.ticks.length.x = unit(.4, "cm"),
           axis.ticks.length.y = unit(.4, "cm"),
           panel.border = element_rect(color = "black", size = 1.5),
-          plot.title = element_text(size = 50, hjust = 0.5, face = "bold", margin = margin(b = 15, unit = "pt")),
-          plot.margin = unit(c(.5,.5,.5,.5), "cm"),
+          plot.title = element_text(size = 50, face = "bold", hjust = 0.5, margin = margin(b = 15, unit = "pt")),
+          plot.margin = unit(c(.05,1,.05,.5), "cm"),
           panel.grid.minor = element_blank(),
           panel.grid.major = element_blank(),
           legend.key.width = unit(4, "cm"),
@@ -548,13 +548,17 @@ all_5_nights_BW
 # called in the aesthetics for all geoms in order to create the legend we wanted, but R has to ignore the aesthetics that don't exist for some 
 # of those geoms - i.e. there is no shape for the cumulative count line
 plot_20190504v <- whim_plot("2019-05-04") +
-  labs(x = "", y = "") 
+  labs(x = "", y = "") +
+    theme(axis.text.x = element_blank())
 plot_20190516v <- whim_plot("2019-05-16") +
-  labs(x = "", y = "") 
+  labs(x = "", y = "") +
+    theme(axis.text.x = element_blank())
 plot_20190517v <- whim_plot("2019-05-17") +
-  labs(x = "") 
+  labs(x = "") +
+    theme(axis.text.x = element_blank())
 plot_20200504v <- whim_plot("2020-05-04") +
-  labs(x = "", y = "") 
+  labs(x = "", y = "") +
+    theme(axis.text.x = element_blank())
 plot_20200505v <- whim_plot("2020-05-05") +
   labs(y = "")
 
@@ -572,10 +576,9 @@ ggsave("plot_20200505v.jpg", plot_20200505v, width = 7, height = 5)
 ```{r}
 BW_vertical <- (plot_20190504v / plot_20190516v / plot_20190517v / plot_20200504v / plot_20200505v + 
                 plot_layout(guides = "collect") & theme(legend.position = "bottom",
-                legend.box.margin = margin(.1, .1, .1, .1, unit = "cm"), legend.box = "vertical"))
+                legend.box.margin = margin(1, .1, .1, .1, unit = "cm"), legend.box = "vertical"))
 
 BW_vertical
-ggsave("BW_vertical_test_AB.jpg", BW_vertical, width = 12, height = 45, dpi=300)
 ```
 
 
@@ -583,5 +586,6 @@ ggsave("BW_vertical_test_AB.jpg", BW_vertical, width = 12, height = 45, dpi=300)
 # save 
 ggsave("WaderStudy_Fig2_2021-03-24_BW.jpg", all_5_nights_BW, width = 36, height = 20, dpi = 300)
 ggsave("WHIM-roost_Fig2.pdf", all_5_nights_BW, device = "pdf", width = 36, height = 20, dpi = 300)
-ggsave("BW_vertical_test_AB.jpg", BW_vertical, width = 10, height = 45, dpi=300)
+ggsave("BW_vertical.jpg", BW_vertical, width = 12, height = 40, dpi=300)
+ggsave("Wader_Study_Fig2_BW_Vertical.pdf", width=12, height=40, dpi=300)
 ```
